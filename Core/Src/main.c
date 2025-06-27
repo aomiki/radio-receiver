@@ -47,6 +47,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+uint8_t buffer[1];
 
 /* USER CODE END PV */
 
@@ -131,8 +132,10 @@ int main(void)
 
   char msg0[256] = "⛵ Shellow from SSAU & Vela & radio receiver!! ⛵\n\r\0";
   send_message(msg0, PRIORITY_HIGH);
+  
+  HAL_UART_Receive_IT(&huart1, buffer, 1);
 
-  HAL_Delay(60000);
+  HAL_Delay(10000);
 
   log_radio_state();
   radio_init();
@@ -144,13 +147,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    log_radio_state();
-    
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
-    HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 }
@@ -194,6 +194,12 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+	HAL_UART_Receive_IT(&huart1, buffer, 1);
+	HAL_UART_Transmit(&huart2, buffer, 1, 0xFFFF);
+}
+
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   if(GPIO_Pin == radio_aux_Pin) {
